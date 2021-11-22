@@ -61,9 +61,11 @@ class DE:
         print('粒子的最优函数值为：')
         print(self.global_opt)
         print('一共计算了'+str(self.eval_count)+'次函数值')
-
+        
+        
     def increase_iter_num(self):
         self.iter_num += 1
+        
 
     def init_swarm(self):
         self.eval_count = 0

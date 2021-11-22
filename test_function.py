@@ -1,9 +1,9 @@
-import numpy as np  
+import numpy as np
 
 
 def Ackley(X, d=2):
     a = 20
-    b = 0.2 
+    b = 0.2
     c = 2 * np.pi
     temp1 = 0
     temp2 = 0
@@ -12,7 +12,7 @@ def Ackley(X, d=2):
         temp2 = temp2 + np.cos(c * X[i])
     result = -a*np.exp(-b*np.sqrt(1/d*temp1))-np.exp(1/d*temp2)+a+np.exp(1)
     return result
-    
+
 
 def Griewank(X, d=2):
     temp1 = 0
@@ -31,7 +31,8 @@ def LevyF(X, d=2):
         w[i] = 1 + (X[i] - 1) / 4
         if i < d - 1:
             temp1 = temp1 + (w[i]-1)**2*(1+10*np.sin(np.pi*w[i]+1)**2)
-    result = np.sin(np.pi*w[0])**2+temp1+(w[d-1]-1)**2*(1+np.sin(2*np.pi*w[d-1])**2)
+    result = np.sin(np.pi*w[0])**2+temp1+(w[d-1]-1)**2 * \
+        (1+np.sin(2*np.pi*w[d-1])**2)
     return result
 
 
@@ -91,7 +92,10 @@ def Styblinski_Tang(X, d=2):
     return result
 
 
-test_functions = [Ackley, Griewank, LevyF, Rastrigin, Schwefel, Sphere, Zakharov, Rosenbrock, Michalewicz, Styblinski_Tang]
-test_function_names = ['Ackley', 'Griewank', 'LevyF', 'Rastrigin', 'Schwefel', 'Sphere', 'Zakharov', 'Rosenbrock', 'Michalewicz', 'Styblinski_Tang']
-test_function_min = [0,0,0,0,0,0,0,0,'?','-39.16599*d']
-value_ranges = [[-32.768, 32.768],[-600, 600],[-10, 10],[-5.12, 5.12],[-500, 500],[-5.12, 5.12],[-5.12, 5.12],[-5, 10],[0, np.pi],[-5, 5]]
+test_functions = [Ackley, Griewank, LevyF, Rastrigin, Schwefel,
+                  Sphere, Zakharov, Rosenbrock, Michalewicz, Styblinski_Tang]
+test_function_names = ['Ackley', 'Griewank', 'LevyF', 'Rastrigin', 'Schwefel',
+                       'Sphere', 'Zakharov', 'Rosenbrock', 'Michalewicz', 'Styblinski_Tang']
+test_function_min = [0, 0, 0, 0, 0, 0, 0, 0, '?', '-39.16599*d']
+value_ranges = [[-32.768, 32.768], [-600, 600], [-10, 10], [-5.12, 5.12],
+                [-500, 500], [-5.12, 5.12], [-5.12, 5.12], [-5, 10], [0, np.pi], [-5, 5]]

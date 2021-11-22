@@ -6,14 +6,20 @@ from test_function import value_ranges
 from limit_variables import *
 
 
-class DE:
-    def __init__(self, function_num=0, iter_max=50, swarm_size=50, dim=2, CR=0.2, F=0.5):
+class PSO:
+    def __init__(self, function_num=0, iter_max=50, swarm_size=50, dim=2, w_max=0.2, w_min=0.5, c1=2, c2=2):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
-        self.CR = CR
-        self.F = F
+        self.w_max = w_max
+        self.w_min = w_min
+        self.w = w_max
+        self.c1 = c1
+        self.c2 = c2
         self.X = np.zeros((swarm_size, dim))
+        self.V = np.zeros((swarm_size, dim))
+        self.p_best = np.zeros((swarm_size, dim))
+        self.p_aff = np.zeros(swarm_size)
         self.fun = np.ones((swarm_size))
         self.solution = np.zeros((dim))
         self.global_params = [0 for x in range(dim)]
@@ -74,38 +80,39 @@ class DE:
                     self.value_range[0], self.value_range[1])
             self.fun[i] = self.obj_function(self.X[i])
             self.eval_count = self.eval_count + 1
+            self.p_best[i] = np.copy(self.X[i])
+            self.p_aff[i] = self.fun[i]
             if self.fun[i] < self.global_opt:
                 self.global_opt = self.fun[i]
                 self.global_params = np.copy(self.X[i][:])
 
-    def differential(self):
-        u = np.copy(self.X)
-        for i in range(self.swarm_size):
-            a = list(range(self.swarm_size))
-            a.remove(i)
-            random_arr = random.sample(a, 3)
-            select_x = [self.X[random_arr[0]],
-                        self.X[random_arr[1]], self.X[random_arr[2]]]
-            u[i] = select_x[0]+self.F*(select_x[1]-select_x[2])
-            u[i] = limit_variables(u[i], self.value_range)
-        v = np.copy(self.X)
-        for i in range(self.swarm_size):
-            drand = random.sample(range(self.dim), 1)
-            for j in range(self.dim):
-                if random.random() < self.CR or j == drand[0]:
-                    v[i][j] = u[i][j]
-            aff = self.obj_function(v[i])
-            self.eval_count += 1
-            if aff < self.fun[i]:
-                self.X[i] = np.copy(v[i])
-                self.fun[i] = aff
-        self.memory_best_value()
+    def change_w(self):
+        self.w = self.w_max - ((self.w_max - self.w_min) /
+                               self.iter_max) * self.iter_num
 
-    def get_DE(self):
+    def cal_pso(self):
+        for p in range(self.swarm_size):
+            for q in range(self.dim):
+                self.V[p][q] = self.w * self.V[p][q] + self.c1 * random.random() * (self.p_best[p][q] -
+                                                                                    self.X[p][q]) + self.c2 * random.random() * (self.global_params[q] - self.X[p][q])
+                self.X[p][q] = self.X[p][q] + self.V[p][q]
+            self.V[p] = limit_variables(self.V[p], self.value_range)
+            self.X[p] = limit_variables(self.X[p], self.value_range)
+            aff = self.obj_function(self.X[p])
+            self.eval_count += 1
+            if aff < self.p_aff[p]:
+                self.p_aff[p] = aff
+                self.p_best[p] = np.copy(self.X[p])
+            if aff < self.global_opt:
+                self.global_opt = aff
+                self.global_params = np.copy(self.X[p])
+
+    def get_PSO(self):
         self.init_swarm()
         self.init_introduction()
         while(not(self.stopping_condition())):
-            self.differential()
+            self.cal_pso()
+            self.change_w()
             self.iter_introduction()
             self.increase_iter_num()
         self.end_introduction()
