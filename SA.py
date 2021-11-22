@@ -7,13 +7,13 @@ from limit_variables import *
 
 
 class SA:
-    def __init__(self, function_num=0, dim=2, T_max=100, T_min=1, alpha=0.98, mean_markov=100, step_factor=0.02):
+    def __init__(self, function_num=0, dim=2, iter_max=50, T_max=100, T_min=1, mean_markov=50, step_factor=0.4):
         self.function_num = function_num
         self.dim = dim
         self.T_max = T_max
         self.T_min = T_min
         self.T = T_max
-        self.alpha = alpha
+        self.iter_max = iter_max
         self.mean_markov = mean_markov
         self.step_factor = step_factor
         self.fun = float("inf")
@@ -27,7 +27,7 @@ class SA:
         random.seed()
 
     def stopping_condition(self):
-        status = bool(self.T <= self.T_min)
+        status = bool(self.iter_num >= self.iter_max)
         return status
 
     def obj_function(self, X):
@@ -58,8 +58,8 @@ class SA:
         print(self.global_params)
         print('粒子的最优函数值为：')
         print(self.global_opt)
-        print('一共计算了'+str(self.eval_count)+'次函数值')   
-        
+        print('一共计算了'+str(self.eval_count)+'次函数值')
+
     def increase_iter_num(self):
         self.iter_num += 1
 
@@ -68,7 +68,7 @@ class SA:
         self.iter_num = 0
         for i in range(self.dim):
             self.solution[i] = random.uniform(
-                    self.value_range[0], self.value_range[1])
+                self.value_range[0], self.value_range[1])
         self.fun = self.obj_function(self.solution)
         self.eval_count = self.eval_count + 1
         self.global_opt = self.fun
@@ -77,33 +77,40 @@ class SA:
     def generate(self):
         t = np.random.randint(2)
         new_x = np.copy(self.solution)
-        new_x[t] = self.solution[t] + self.step_factor * self.value_range[t] * (random.random()-0.5)
+        new_x[t] = self.solution[t] + self.step_factor * \
+            self.value_range[t] * (random.random()-0.5) * 2
         limit_variables(new_x, self.value_range)
         return new_x
 
-    def accept_value(self,new_x):
+    def accept_value(self, new_x):
         new_y = self.obj_function(new_x)
         self.eval_count += 1
-        if(new_y < self.fun):
+        if new_y < self.fun:
             self.solution = new_x
+            self.fun = new_y
+            if new_y < self.global_opt:
+                self.global_opt = new_y
+                self.global_params = new_x
         else:
             accept_rate = np.exp(-(new_y-self.fun)/self.T)
             reference_rate = random.random()
-            if accept_rate>=reference_rate:
+            if accept_rate >= reference_rate:
                 self.solution = new_x
+                self.fun = new_y
 
     def lower_t(self):
-        result = self.T_max * (self.alpha ** self.iter_num)
+        result = self.T_max - (self.T_max - self.T_min) / \
+            self.iter_max * self.iter_num
         self.T = result
 
     def get_SA(self):
         self.init()
         self.init_introduction()
         while(not(self.stopping_condition())):
-            for i in range(self.mean_markov):
+            for _ in range(self.mean_markov):
                 x = self.generate()
                 self.accept_value(x)
             self.iter_introduction()
             self.increase_iter_num()
-            self.lower_t()   
+            self.lower_t()
         self.end_introduction()

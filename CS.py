@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import random
 from test_function import test_function_names
 from test_function import test_functions
@@ -83,8 +84,8 @@ class CS:
                 self.global_pos = i
 
     def get_new_nest_via_levy(self):
-        sigma_u = (np.random.gamma(1 + self.beta) * np.sin(np.pi * self.beta / 2) / (
-            np.random.gamma((1 + self.beta) / 2) * self.beta * (2 ** ((self.beta - 1) / 2)))) ** (1 / self.beta)
+        sigma_u = (math.gamma(1 + self.beta) * np.sin(np.pi * self.beta / 2) / (
+            math.gamma((1 + self.beta) / 2) * self.beta * (2 ** ((self.beta - 1) / 2)))) ** (1 / self.beta)
         sigma_v = 1
         Xt = np.copy(self.X)
         for i in range(self.swarm_size):
@@ -101,26 +102,27 @@ class CS:
 
     def empty_nests(self):
         ori_nest = np.copy(self.X)
-        ori_nest = np.delete(ori_nest, self.global_pos, 0)
+        ori_nest = np.delete(ori_nest,self.global_pos,0)
         nest1 = np.copy(ori_nest)
         nest2 = np.copy(ori_nest)
-        rand_m = self.pa - np.random.rand(self.swarm_size-1, self.dim)
-        rand_m = np.heaviside(rand_m, 0)
+        rand_m = self.pa - np.random.rand(self.swarm_size-1,self.dim)
+        rand_m = np.heaviside(rand_m,0)
         np.random.shuffle(nest1)
         np.random.shuffle(nest2)
-        stepsize = np.random.rand(1, 1) * (nest1 - nest2)
-        newnest = ori_nest + stepsize * rand_m
-        newnest = np.append(newnest, [self.global_params], axis=0)
+        stepsize = np.random.rand(1,1) * (nest1 - nest2)
+        new_nest = ori_nest + stepsize * rand_m
+        new_nest = np.append(new_nest, [self.X[self.global_pos]], axis=0)
         for i in range(self.swarm_size):
-            limit_variables(newnest[i], self.value_range)
-        return newnest
+            limit_variables(new_nest[i],self.value_range)
+        return new_nest
+        
 
     def get_best_nest(self, newnest):
         for i in range(self.swarm_size):
             temp = self.obj_function(newnest[i, :])
             self.eval_count += 1
             if self.fun[i] > temp:
-                self.X[i, :] = newnest[i, :]
+                self.X[i] = newnest[i]
                 self.fun[i] = temp
                 if temp < self.global_opt:
                     self.global_opt = temp
@@ -133,8 +135,8 @@ class CS:
         while(not(self.stopping_condition())):
             newnest = self.get_new_nest_via_levy()
             self.get_best_nest(newnest)
-            newnest_c = self.empty_nests()
-            self.get_best_nest(newnest_c)
+            nest_c = self.empty_nests()
+            self.get_best_nest(nest_c)
             self.iter_introduction()
             self.increase_iter_num()
         self.end_introduction()
