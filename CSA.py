@@ -8,7 +8,7 @@ from limit_variables import *
 
 
 class CSA:
-    def __init__(self, function_num=0, iter_max=100, swarm_size=100, dim=2, selection_size=10, max_clone=5, mutation_rate=0.2, mutation_step=0.2, drop_size=20):
+    def __init__(self, function_num=0, dim=2, iter_max=100, swarm_size=100, selection_size=5, max_clone=10, mutation_rate=0.3, mutation_step=0.04, drop_size=20):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
@@ -43,10 +43,10 @@ class CSA:
                 self.global_params = np.copy(self.X[i][:])
 
     def obj_function(self, X):
-        return test_functions[self.function_num](X)
+        return test_functions[self.function_num](X, self.dim)
 
     def init_introduction(self):
-        print('初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
+        print('CSA初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
               '，使用粒子数为'+str(self.swarm_size)+'，将进行'+str(self.iter_max)+'次迭代。')
         print('----------------------')
         print('初始化粒子的最优位置为：')
@@ -120,8 +120,8 @@ class CSA:
         for i in range(len(clone_cells)):
             if rdn[i] < self.mutation_rate:
                 cell = np.copy(clone_cells[i])
-                j = np.random.randint(2)
-                cell[j] = cell[j] + (random.random()*2-1)*self.mutation_step*self.value_range[j]
+                j = np.random.randint(self.dim)
+                cell[j] = cell[j] + (random.random()*2-1)*self.mutation_step*self.value_range[1]
                 cell = limit_variables(cell, self.value_range)
                 mutationed_cells.append(cell)
                 fun_arr[i] = self.obj_function(cell)
@@ -132,18 +132,17 @@ class CSA:
         return mutationed_cells, fun_arr, aff_arr
 
     def regroup(self, mutationed_cells, fun_arr, aff_arr):
-        np.delete(self.X,self.best_index_list,0)
-        np.delete(self.fun,self.best_index_list,0)
-        np.delete(self.aff,self.best_index_list,0)
-        np.vstack((self.X,mutationed_cells))
-        np.append(self.fun,fun_arr)
-        np.append(self.aff,aff_arr)
+        self.X = np.vstack((self.X,mutationed_cells))
+        self.fun = np.append(self.fun,fun_arr)
+        self.aff = np.append(self.aff,aff_arr)
 
     def reselect(self):
         remain_index_list = list(map(self.fun.tolist().index, heapq.nsmallest(self.swarm_size - self.drop_size, self.fun)))
         self.X = self.X.take(remain_index_list, 0)
         self.fun = self.fun.take(remain_index_list)
         self.aff = self.aff.take(remain_index_list)
+        self.global_opt = self.fun[0]
+        self.global_params = self.X[0]
 
     def reinit(self):
         pos = np.zeros((self.drop_size, self.dim))
@@ -159,13 +158,13 @@ class CSA:
             if fun[i] < self.global_opt:
                 self.global_opt = fun[i]
                 self.global_params = np.copy(pos[i])
-        np.vstack((self.X,pos))
-        np.append(self.fun,fun)
-        np.append(self.aff,aff)
+        self.X = np.vstack((self.X,pos))
+        self.fun = np.append(self.fun,fun)
+        self.aff = np.append(self.aff,aff)
 
     def get_CSA(self):
         self.init_swarm()
-        self.init_introduction()
+        # self.init_introduction()
         while(not(self.stopping_condition())):
             self.select()
             clone_cells, fun_arr, aff_arr = self.clone()
@@ -173,6 +172,6 @@ class CSA:
             self.regroup(mutationed_cells, fun_arr, aff_arr)
             self.reselect()
             self.reinit()
-            self.iter_introduction()
+            # self.iter_introduction()
             self.increase_iter_num()
         self.end_introduction()

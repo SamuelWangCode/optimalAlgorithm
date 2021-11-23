@@ -8,7 +8,7 @@ from limit_variables import *
 
 
 class CS:
-    def __init__(self, function_num=0, iter_max=50, swarm_size=50, dim=2, lamuda=1, beta=1.5, pa=0.25):
+    def __init__(self, function_num=0, dim=2, iter_max=50, swarm_size=25, lamuda=1, beta=1.5, pa=0.25):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
@@ -40,10 +40,10 @@ class CS:
                 self.global_pos = i
 
     def obj_function(self, X):
-        return test_functions[self.function_num](X)
+        return test_functions[self.function_num](X, self.dim)
 
     def init_introduction(self):
-        print('初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
+        print('CS初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
               '，使用粒子数为'+str(self.swarm_size)+'，将进行'+str(self.iter_max)+'次迭代。')
         print('----------------------')
         print('初始化粒子的最优位置为：')
@@ -131,12 +131,12 @@ class CS:
 
     def get_CS(self):
         self.init_swarm()
-        self.init_introduction()
+        # self.init_introduction()
         while(not(self.stopping_condition())):
             newnest = self.get_new_nest_via_levy()
             self.get_best_nest(newnest)
             nest_c = self.empty_nests()
             self.get_best_nest(nest_c)
-            self.iter_introduction()
+            # self.iter_introduction()
             self.increase_iter_num()
         self.end_introduction()

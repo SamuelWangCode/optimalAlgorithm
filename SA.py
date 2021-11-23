@@ -31,10 +31,10 @@ class SA:
         return status
 
     def obj_function(self, X):
-        return test_functions[self.function_num](X)
+        return test_functions[self.function_num](X, self.dim)
 
     def init_introduction(self):
-        print('初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim))
+        print('SA初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim))
         print('----------------------')
         print('初始化粒子的位置为：')
         print(self.global_params)
@@ -75,10 +75,10 @@ class SA:
         self.global_params = np.copy(self.solution)
 
     def generate(self):
-        t = np.random.randint(2)
+        t = np.random.randint(self.dim)
         new_x = np.copy(self.solution)
         new_x[t] = self.solution[t] + self.step_factor * \
-            self.value_range[t] * (random.random()-0.5) * 2
+            self.value_range[1] * (random.random()-0.5) * 2
         limit_variables(new_x, self.value_range)
         return new_x
 
@@ -105,12 +105,12 @@ class SA:
 
     def get_SA(self):
         self.init()
-        self.init_introduction()
+        # self.init_introduction()
         while(not(self.stopping_condition())):
             for _ in range(self.mean_markov):
                 x = self.generate()
                 self.accept_value(x)
-            self.iter_introduction()
+            # self.iter_introduction()
             self.increase_iter_num()
             self.lower_t()
         self.end_introduction()

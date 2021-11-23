@@ -7,7 +7,7 @@ from limit_variables import *
 
 
 class ABC:
-    def __init__(self, function_num=0, iter_max=50, swarm_size=50, dim=2, trail_max=20):
+    def __init__(self, function_num=0, dim=2, iter_max=50, swarm_size=25, trail_max=20):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
@@ -37,10 +37,10 @@ class ABC:
                 self.global_params = np.copy(self.X[i][:])
 
     def obj_function(self, X):
-        return test_functions[self.function_num](X)
+        return test_functions[self.function_num](X, self.dim)
 
     def init_introduction(self):
-        print('初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
+        print('ABC初始化完成，测试函数为'+str(self.function_name)+'，维数为'+str(self.dim) +
               '，使用粒子数为'+str(self.swarm_size)+'，将进行'+str(self.iter_max)+'次迭代。')
         print('----------------------')
         print('初始化粒子的最优位置为：')
@@ -78,6 +78,14 @@ class ABC:
             if self.fun[i] < self.global_opt:
                 self.global_opt = self.fun[i]
                 self.global_params = np.copy(self.X[i][:])
+
+    def init(self, index):
+        for i in range(self.dim):
+            self.X[index][i] = random.uniform(
+                    self.value_range[0], self.value_range[1])
+            self.solution = np.copy(self.X[index][:])
+            self.fun[index] = self.obj_function(self.solution)
+            self.trial[index] = 0
 
     def send_employed_bees(self):
         i = 0
@@ -146,17 +154,17 @@ class ABC:
 
     def send_scout_bees(self):
         if np.amax(self.trial) >= self.trial_max:
-            self.init_swarm()
+            self.init(self.trial.argmax(axis = 0))
 
     def get_ABC(self):
         self.init_swarm()
-        self.init_introduction()
+        # self.init_introduction()
         while(not(self.stopping_condition())):
             self.send_employed_bees()
             self.calculate_probabilities()
             self.send_onlooker_bees()
             self.memory_best_value()
             self.send_scout_bees()
-            self.iter_introduction()
+            # self.iter_introduction()
             self.increase_iter_num()
         self.end_introduction()
