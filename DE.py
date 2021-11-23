@@ -108,4 +108,4 @@ class DE:
             self.differential()
             # self.iter_introduction()
             self.increase_iter_num()
-        self.end_introduction()
+        # self.end_introduction()

@@ -167,4 +167,4 @@ class ABC:
             self.send_scout_bees()
             # self.iter_introduction()
             self.increase_iter_num()
-        self.end_introduction()
+        # self.end_introduction()

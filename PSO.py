@@ -115,4 +115,4 @@ class PSO:
             self.change_w()
             # self.iter_introduction()
             self.increase_iter_num()
-        self.end_introduction()
+        # self.end_introduction()

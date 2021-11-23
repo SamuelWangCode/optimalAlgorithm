@@ -139,4 +139,4 @@ class CS:
             self.get_best_nest(nest_c)
             # self.iter_introduction()
             self.increase_iter_num()
-        self.end_introduction()
+        # self.end_introduction()

@@ -113,4 +113,4 @@ class SA:
             # self.iter_introduction()
             self.increase_iter_num()
             self.lower_t()
-        self.end_introduction()
+        # self.end_introduction()

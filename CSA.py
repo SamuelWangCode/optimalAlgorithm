@@ -8,7 +8,7 @@ from limit_variables import *
 
 
 class CSA:
-    def __init__(self, function_num=0, dim=2, iter_max=100, swarm_size=100, selection_size=5, max_clone=10, mutation_rate=0.3, mutation_step=0.04, drop_size=20):
+    def __init__(self, function_num=0, dim=2, iter_max=100, swarm_size=100, selection_size=5, max_clone=10, mutation_rate=0.3, mutation_step=1, drop_size=20):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
@@ -174,4 +174,4 @@ class CSA:
             self.reinit()
             # self.iter_introduction()
             self.increase_iter_num()
-        self.end_introduction()
+        # self.end_introduction()
