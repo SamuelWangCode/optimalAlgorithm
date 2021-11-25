@@ -5,21 +5,20 @@ from PSO import *
 from SA import *
 from CSA import *
 import numpy as np
-from matplotlib import pyplot as plt
 from test_function import *
 
-fun = np.zeros((5,10,6,30))
-for i in range(5):
+fun = np.zeros((10, 30, 6, 100))
+for i in range(10):
     print(test_function_names[i])
-    for j in range(10):
-        print('dim=',j+1)
-        a = DE(i,j+1)
-        b = ABC(i,j+1)
-        c = CS(i,j+1)
-        d = PSO(i,j+1)
-        e = SA(i,j+1)
-        f = CSA(i,j+1)
-        for p in range(30):
+    for j in range(30):
+        print('dim=', j+1)
+        a = DE(i, j+1)
+        b = ABC(i, j+1)
+        c = CS(i, j+1)
+        d = PSO(i, j+1)
+        e = SA(i, j+1)
+        f = CSA(i, j+1)
+        for p in range(100):
             a.get_DE()
             b.get_ABC()
             c.get_CS()
@@ -35,16 +34,4 @@ for i in range(5):
 
 print(fun)
 
-np.savez('./fun.npz', fun = fun)
-
-
-
-
-
-
-
-
-
-
-
-
+np.savez('./fun.npz', fun=fun)

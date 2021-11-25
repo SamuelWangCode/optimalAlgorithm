@@ -15,7 +15,6 @@ class DE:
         self.F = F
         self.X = np.zeros((swarm_size, dim))
         self.fun = np.ones((swarm_size))
-        self.solution = np.zeros((dim))
         self.global_params = [0 for x in range(dim)]
         self.global_opt = float("inf")
         self.iter_num = 0

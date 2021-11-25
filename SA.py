@@ -86,16 +86,16 @@ class SA:
         new_y = self.obj_function(new_x)
         self.eval_count += 1
         if new_y < self.fun:
-            self.solution = new_x
+            self.solution = np.copy(new_x)
             self.fun = new_y
             if new_y < self.global_opt:
                 self.global_opt = new_y
-                self.global_params = new_x
+                self.global_params = np.copy(new_x)
         else:
             accept_rate = np.exp(-(new_y-self.fun)/self.T)
             reference_rate = random.random()
             if accept_rate >= reference_rate:
-                self.solution = new_x
+                self.solution = np.copy(new_x)
                 self.fun = new_y
 
     def lower_t(self):

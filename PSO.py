@@ -21,7 +21,6 @@ class PSO:
         self.p_best = np.zeros((swarm_size, dim))
         self.p_aff = np.zeros(swarm_size)
         self.fun = np.ones((swarm_size))
-        self.solution = np.zeros((dim))
         self.global_params = [0 for x in range(dim)]
         self.global_opt = float("inf")
         self.iter_num = 0

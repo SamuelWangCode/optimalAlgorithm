@@ -8,7 +8,7 @@ from limit_variables import *
 
 
 class CS:
-    def __init__(self, function_num=0, dim=2, iter_max=50, swarm_size=25, lamuda=1, beta=1.5, pa=0.25):
+    def __init__(self, function_num=0, dim=2, iter_max=50, swarm_size=40, lamuda=1, beta=1.5, pa=0.25):
         self.swarm_size = swarm_size
         self.function_num = function_num
         self.dim = dim
@@ -101,21 +101,23 @@ class CS:
         return Xt
 
     def empty_nests(self):
-        ori_nest = np.copy(self.X)
-        ori_nest = np.delete(ori_nest,self.global_pos,0)
-        nest1 = np.copy(ori_nest)
-        nest2 = np.copy(ori_nest)
-        rand_m = self.pa - np.random.rand(self.swarm_size-1,self.dim)
-        rand_m = np.heaviside(rand_m,0)
-        np.random.shuffle(nest1)
-        np.random.shuffle(nest2)
-        stepsize = np.random.rand(1,1) * (nest1 - nest2)
-        new_nest = ori_nest + stepsize * rand_m
-        new_nest = np.append(new_nest, [self.X[self.global_pos]], axis=0)
         for i in range(self.swarm_size):
-            limit_variables(new_nest[i],self.value_range)
-        return new_nest
-        
+            if not(i == self.global_pos):
+                if random.random() < self.pa:
+                    select_nest = np.random.randint(0, self.swarm_size, (2))
+                    stepsize = random.random() * \
+                        (self.X[select_nest[0]] - self.X[select_nest[1]])
+                    new_nest = self.X[i] + stepsize
+                    limit_variables(new_nest, self.value_range)
+                    fun = self.obj_function(new_nest)
+                    self.eval_count += 1
+                    if fun < self.fun[i]:
+                        self.fun[i] = fun
+                        self.X[i] = np.copy(new_nest)
+                        if fun < self.global_opt:
+                            self.global_opt = fun
+                            self.global_params = np.copy(new_nest)
+                            self.global_pos = i
 
     def get_best_nest(self, newnest):
         for i in range(self.swarm_size):
@@ -135,8 +137,8 @@ class CS:
         while(not(self.stopping_condition())):
             newnest = self.get_new_nest_via_levy()
             self.get_best_nest(newnest)
-            nest_c = self.empty_nests()
-            self.get_best_nest(nest_c)
+            self.empty_nests()
+            # self.get_best_nest(nest_c)
             # self.iter_introduction()
             self.increase_iter_num()
         # self.end_introduction()

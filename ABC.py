@@ -82,7 +82,7 @@ class ABC:
     def init(self, index):
         for i in range(self.dim):
             self.X[index][i] = random.uniform(
-                    self.value_range[0], self.value_range[1])
+                self.value_range[0], self.value_range[1])
             self.solution = np.copy(self.X[index][:])
             self.fun[index] = self.obj_function(self.solution)
             self.trial[index] = 0
@@ -154,7 +154,7 @@ class ABC:
 
     def send_scout_bees(self):
         if np.amax(self.trial) >= self.trial_max:
-            self.init(self.trial.argmax(axis = 0))
+            self.init(self.trial.argmax(axis=0))
 
     def get_ABC(self):
         self.init_swarm()

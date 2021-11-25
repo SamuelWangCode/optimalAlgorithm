@@ -20,7 +20,6 @@ class CSA:
         self.X = np.zeros((swarm_size, dim))
         self.fun = np.ones((swarm_size))
         self.aff = np.zeros((swarm_size))
-        self.solution = np.zeros((dim))
         self.global_params = [0 for x in range(dim)]
         self.global_opt = float("inf")
         self.best_index_list = np.zeros((selection_size))
@@ -142,7 +141,7 @@ class CSA:
         self.fun = self.fun.take(remain_index_list)
         self.aff = self.aff.take(remain_index_list)
         self.global_opt = self.fun[0]
-        self.global_params = self.X[0]
+        self.global_params = np.copy(self.X[0])
 
     def reinit(self):
         pos = np.zeros((self.drop_size, self.dim))
